@@ -1,0 +1,65 @@
+//Problem: Given an array of integers, count the number of subarrays whose sum is equal to zero.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100000
+
+// Simple hash map using arrays (for competitive programming purpose)
+typedef struct {
+    long long key;
+    long long value;
+} Hash;
+
+Hash hashTable[MAX];
+
+// Function to find index using linear probing
+int findIndex(long long key) {
+    int idx = abs(key) % MAX;
+    while (hashTable[idx].key != 0 && hashTable[idx].key != key) {
+        idx = (idx + 1) % MAX;
+    }
+    return idx;
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    long long arr[n];
+    for (int i = 0; i < n; i++) {
+        scanf("%lld", &arr[i]);
+    }
+
+    long long prefixSum = 0;
+    long long count = 0;
+
+    // Initialize hash table
+    for (int i = 0; i < MAX; i++) {
+        hashTable[i].key = 0;
+        hashTable[i].value = 0;
+    }
+
+    // Important: prefix sum 0 appears once initially
+    int idx0 = findIndex(0);
+    hashTable[idx0].key = 0;
+    hashTable[idx0].value = 1;
+
+    for (int i = 0; i < n; i++) {
+        prefixSum += arr[i];
+
+        int idx = findIndex(prefixSum);
+
+        if (hashTable[idx].key == prefixSum) {
+            count += hashTable[idx].value;
+            hashTable[idx].value++;
+        } else {
+            hashTable[idx].key = prefixSum;
+            hashTable[idx].value = 1;
+        }
+    }
+
+    printf("%lld\n", count);
+
+    return 0;
+}
