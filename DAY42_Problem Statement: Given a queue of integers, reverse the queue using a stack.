@@ -1,5 +1,4 @@
-Problem Statement:
-Given a queue of integers, reverse the queue using a stack.
+//Problem Statement: Given a queue of integers, reverse the queue using a stack.
 #include <stdio.h>
 
 #define MAX 100
