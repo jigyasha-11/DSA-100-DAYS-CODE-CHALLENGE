@@ -1,0 +1,72 @@
+//Problem: BST Insert
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definition of BST Node
+struct TreeNode {
+    int val;
+    struct TreeNode* left;
+    struct TreeNode* right;
+};
+
+// Create new node
+struct TreeNode* newNode(int val) {
+    struct TreeNode* node = (struct TreeNode*)malloc(sizeof(struct TreeNode));
+    node->val = val;
+    node->left = node->right = NULL;
+    return node;
+}
+
+// Insert into BST
+struct TreeNode* insertIntoBST(struct TreeNode* root, int val) {
+    // Base case: insert here
+    if (root == NULL) {
+        return newNode(val);
+    }
+
+    // Recursive insertion
+    if (val < root->val) {
+        root->left = insertIntoBST(root->left, val);
+    } else {
+        root->right = insertIntoBST(root->right, val);
+    }
+
+    return root;
+}
+
+// Inorder traversal (to verify BST)
+void inorder(struct TreeNode* root) {
+    if (root == NULL)
+        return;
+
+    inorder(root->left);
+    printf("%d ", root->val);
+    inorder(root->right);
+}
+
+// Driver code
+int main() {
+    /*
+        Insert: 5, 3, 7, 2, 4
+        BST will be:
+              5
+             / \
+            3   7
+           / \
+          2   4
+    */
+
+    struct TreeNode* root = NULL;
+
+    root = insertIntoBST(root, 5);
+    root = insertIntoBST(root, 3);
+    root = insertIntoBST(root, 7);
+    root = insertIntoBST(root, 2);
+    root = insertIntoBST(root, 4);
+
+    printf("Inorder traversal: ");
+    inorder(root);   // Output: 2 3 4 5 7
+
+    return 0;
+}
