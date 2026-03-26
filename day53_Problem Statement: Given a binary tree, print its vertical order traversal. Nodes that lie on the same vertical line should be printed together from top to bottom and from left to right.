@@ -1,0 +1,133 @@
+//Problem Statement:Given a binary tree, print its vertical order traversal. Nodes that lie on the same vertical line should be printed together from top to bottom and from left to right.
+#include <stdio.h>
+#include <stdlib.h>
+
+// Tree Node
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Queue Node (for BFS)
+struct QNode {
+    struct Node* node;
+    int hd;
+    struct QNode* next;
+};
+
+// Create new tree node
+struct Node* newNode(int data) {
+    struct Node* temp = (struct Node*)malloc(sizeof(struct Node));
+    temp->data = data;
+    temp->left = temp->right = NULL;
+    return temp;
+}
+
+// Create queue node
+struct QNode* newQNode(struct Node* node, int hd) {
+    struct QNode* temp = (struct QNode*)malloc(sizeof(struct QNode));
+    temp->node = node;
+    temp->hd = hd;
+    temp->next = NULL;
+    return temp;
+}
+
+// Enqueue
+void enqueue(struct QNode** front, struct QNode** rear, struct Node* node, int hd) {
+    struct QNode* temp = newQNode(node, hd);
+    if (*rear == NULL) {
+        *front = *rear = temp;
+        return;
+    }
+    (*rear)->next = temp;
+    *rear = temp;
+}
+
+// Dequeue
+struct QNode* dequeue(struct QNode** front, struct QNode** rear) {
+    if (*front == NULL) return NULL;
+    struct QNode* temp = *front;
+    *front = (*front)->next;
+    if (*front == NULL) *rear = NULL;
+    return temp;
+}
+
+// Build tree from level order
+struct Node* buildTree(int arr[], int n) {
+    if (n == 0 || arr[0] == -1) return NULL;
+
+    struct Node* nodes[n];
+
+    for (int i = 0; i < n; i++) {
+        if (arr[i] != -1)
+            nodes[i] = newNode(arr[i]);
+        else
+            nodes[i] = NULL;
+    }
+
+    for (int i = 0; i < n; i++) {
+        if (nodes[i] != NULL) {
+            int left = 2*i + 1;
+            int right = 2*i + 2;
+
+            if (left < n) nodes[i]->left = nodes[left];
+            if (right < n) nodes[i]->right = nodes[right];
+        }
+    }
+
+    return nodes[0];
+}
+
+// Vertical Order Traversal
+void verticalOrder(struct Node* root) {
+    if (root == NULL) return;
+
+    int map[200][200];   // store values
+    int count[200] = {0};
+    int offset = 100;    // to handle negative HD
+
+    struct QNode* front = NULL;
+    struct QNode* rear = NULL;
+
+    enqueue(&front, &rear, root, 0);
+
+    while (front != NULL) {
+        struct QNode* temp = dequeue(&front, &rear);
+        struct Node* curr = temp->node;
+        int hd = temp->hd;
+
+        map[hd + offset][count[hd + offset]++] = curr->data;
+
+        if (curr->left)
+            enqueue(&front, &rear, curr->left, hd - 1);
+        if (curr->right)
+            enqueue(&front, &rear, curr->right, hd + 1);
+
+        free(temp);
+    }
+
+    // Print result
+    for (int i = 0; i < 200; i++) {
+        if (count[i] > 0) {
+            for (int j = 0; j < count[i]; j++)
+                printf("%d ", map[i][j]);
+            printf("\n");
+        }
+    }
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    int arr[n];
+    for (int i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    struct Node* root = buildTree(arr, n);
+
+    verticalOrder(root);
+
+    return 0;
+}
