@@ -1,0 +1,93 @@
+//Problem: Print topological ordering of a Directed Acyclic Graph (DAG) using DFS.
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure
+struct Node {
+    int vertex;
+    struct Node* next;
+};
+
+// Create node
+struct Node* createNode(int v) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = v;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Add edge (directed)
+void addEdge(struct Node* adj[], int u, int v) {
+    struct Node* newNode = createNode(v);
+    newNode->next = adj[u];
+    adj[u] = newNode;
+}
+
+// DFS function
+void dfs(int node, int visited[], struct Node* adj[], int stack[], int* top) {
+    visited[node] = 1;
+
+    struct Node* temp = adj[node];
+    while (temp) {
+        int adjNode = temp->vertex;
+
+        if (!visited[adjNode]) {
+            dfs(adjNode, visited, adj, stack, top);
+        }
+        temp = temp->next;
+    }
+
+    // Push to stack after visiting neighbors
+    stack[++(*top)] = node;
+}
+
+// Topological sort function
+void topologicalSort(int V, struct Node* adj[]) {
+    int visited[V];
+    int stack[V];
+    int top = -1;
+
+    // Initialize visited
+    for (int i = 0; i < V; i++)
+        visited[i] = 0;
+
+    // Call DFS for all vertices
+    for (int i = 0; i < V; i++) {
+        if (!visited[i]) {
+            dfs(i, visited, adj, stack, &top);
+        }
+    }
+
+    // Print in reverse order
+    printf("Topological Order:\n");
+    for (int i = top; i >= 0; i--) {
+        printf("%d ", stack[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int V, E, u, v;
+
+    printf("Enter number of vertices: ");
+    scanf("%d", &V);
+
+    printf("Enter number of edges: ");
+    scanf("%d", &E);
+
+    struct Node* adj[V];
+
+    // Initialize adjacency list
+    for (int i = 0; i < V; i++)
+        adj[i] = NULL;
+
+    printf("Enter directed edges (u v):\n");
+    for (int i = 0; i < E; i++) {
+        scanf("%d %d", &u, &v);
+        addEdge(adj, u, v);
+    }
+
+    topologicalSort(V, adj);
+
+    return 0;
+}
