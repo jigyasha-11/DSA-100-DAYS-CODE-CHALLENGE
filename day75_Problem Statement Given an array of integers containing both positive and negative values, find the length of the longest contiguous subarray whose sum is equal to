@@ -1,0 +1,54 @@
+//Problem StatementGiven an array of integers containing both positive and negative values, find the length of the longest contiguous subarray whose sum is equal to 
+#include <stdio.h>
+
+#define MAX 1000
+
+// Simple hash structure (using arrays)
+typedef struct {
+    int sum;
+    int index;
+} Hash;
+
+int main() {
+    int arr[] = {15, -2, 2, -8, 1, 7, 10, 23};
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    Hash hash[MAX];
+    int size = 0;
+
+    int prefixSum = 0;
+    int maxLen = 0;
+
+    for (int i = 0; i < n; i++) {
+        prefixSum += arr[i];
+
+        // Case 1: prefix sum = 0
+        if (prefixSum == 0) {
+            maxLen = i + 1;
+        }
+
+        int found = 0;
+
+        // Search if prefixSum already exists
+        for (int j = 0; j < size; j++) {
+            if (hash[j].sum == prefixSum) {
+                int len = i - hash[j].index;
+                if (len > maxLen)
+                    maxLen = len;
+                found = 1;
+                break;
+            }
+        }
+
+        // Store first occurrence
+        if (!found) {
+            hash[size].sum = prefixSum;
+            hash[size].index = i;
+            size++;
+        }
+    }
+
+    printf("%d\n", maxLen);
+
+    return 0;
+}
