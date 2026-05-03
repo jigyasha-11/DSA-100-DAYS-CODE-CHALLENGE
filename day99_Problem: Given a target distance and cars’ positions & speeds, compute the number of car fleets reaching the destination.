@@ -1,0 +1,55 @@
+//Problem: Given a target distance and cars’ positions & speeds, compute the number of car fleets reaching the destination.
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int position;
+    int speed;
+} Car;
+
+// Sort in descending order of position
+int cmp(const void* a, const void* b) {
+    Car* c1 = (Car*)a;
+    Car* c2 = (Car*)b;
+    return c2->position - c1->position;
+}
+
+int carFleet(int target, int* position, int positionSize, int* speed, int speedSize) {
+    if (positionSize == 0) return 0;
+
+    Car cars[positionSize];
+
+    for (int i = 0; i < positionSize; i++) {
+        cars[i].position = position[i];
+        cars[i].speed = speed[i];
+    }
+
+    // Step 1: Sort by position (descending)
+    qsort(cars, positionSize, sizeof(Car), cmp);
+
+    int fleets = 0;
+    double prevTime = 0.0;
+
+    // Step 2: Traverse
+    for (int i = 0; i < positionSize; i++) {
+        double time = (double)(target - cars[i].position) / cars[i].speed;
+
+        if (time > prevTime) {
+            fleets++;
+            prevTime = time;
+        }
+    }
+
+    return fleets;
+}
+
+// Driver
+int main() {
+    int target = 12;
+    int position[] = {10, 8, 0, 5, 3};
+    int speed[] = {2, 4, 1, 1, 3};
+    int n = sizeof(position) / sizeof(position[0]);
+
+    printf("Fleets: %d\n", carFleet(target, position, n, speed, n));
+    return 0;
+}
